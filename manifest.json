@@ -1,0 +1,107 @@
+{
+	"_version": "1.15.0",
+	"sap.app": {
+		"id": "sap.wz.ui.integration.samples.cards.workflow.inbox",
+		"type": "card",
+		"title": "Needs your Attentions",
+		"subTitle": "Show your inbox tasks",
+		"applicationVersion": {
+			"version": "1.0.2"
+		},
+		"shortTitle": "Needs your Attentions",
+		"info": "Show your inbox tasks",
+		"description": "Show your inbox tasks",
+		"tags": {
+			"keywords": [
+				"Workflow",
+				"Inbox"
+			]
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "sap-icon://activity-items"
+		}
+	},
+	"sap.card": {
+		"configuration": {
+			"parameters": {
+                "title": {
+                    "value": "Mijn Taken"
+                },
+				"visibleItems": {
+					"value": "5"
+                }
+			}
+		},
+		"type": "List",
+		"data": {
+			"request": {
+                "url": "https://<<your host>>.workzone.cfapps.<<your environment>>.hana.ondemand.com/comsapbpmworkflow.crossfndfioriinbox/bpmworkflowruntime/v1/tcm/TaskCollection",
+                "parameters": {
+                    "$expand": "Description",
+                    "$inlinecount": "allpages",
+                    "$top": "10",
+                    "$orderby": "CreatedOn desc",
+                    "$format":"json"
+                },
+				"withCredentials": true
+			}
+		},
+		"header": {
+			"title": "{{parameters.title}}",
+			"status": {
+				"text": {
+					"format": {
+						"translationKey": "i18n>CARD.COUNT_X_OF_Y",
+						"parts": [
+							"{{parameters.visibleItems}}",
+							"{{/d/__count}}"
+						]
+					}
+				}
+			},
+			"icon": {
+				"src": "sap-icon://inbox"
+			},
+			"actions": [
+				{
+					"type": "Navigation",
+					"parameters": {
+						"ibnTarget": {
+							"semanticObject": "WorkflowTask",
+							"action": "DisplayMyInbox"
+						}
+					}
+				}
+			]
+		},
+		"content": {
+			"data": {
+				"path": "/d/results"
+			},
+			"item": {
+				"highlight": "{=${Priority}==='MEDIUM'?'Information':'Error'}",
+				"title": "{TaskTitle}",
+				"description": "{= format.dateTime(${CreatedOn}) }",
+				"actions": [
+					{
+						"type": "Navigation",
+						"parameters": {
+							"ibnTarget": {
+								"semanticObject": "WorkflowTask",
+								"action": "DisplayMyInbox"
+							},
+							"ibnParams": {
+								"SAP__Origin": "{SAP__Origin}",
+								"InstanceID": "{InstanceID}"
+							}
+						}
+					}
+				]
+			},
+			"maxItems": "{{parameters.visibleItems}}"
+		}
+	}
+}
